@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const user = require("./routers/user");
 const mongoDB = require("./config/mongoConnect");
+const logger = require('./utils/logger');
 
 const app = express();
 
@@ -16,7 +17,7 @@ app.get("/", (req, res) => {
 app.use("/user", user);
 
 app.listen(PORT, (req, res) => {
-  console.log(`Server Started at PORT ${PORT}`);
+  logger.info(`Server Started at PORT ${PORT}`);
 });
 
 module.exports = app;

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const logger = require('../utils/logger');
 
 const MONGO_PROTOCOL = "mongodb+srv://";
 const MONGO_CREDENTIALS = `${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}`;
@@ -17,10 +18,10 @@ class MongoDB {
       useNewUrlParser: true
     })
       .then(() => {
-        console.log(`Connection to ${MONGO_LOCATION} successful`);
+        logger.info(`Connection to ${MONGO_LOCATION} successful`);
       })
       .catch(err => {
-        console.log(`Connection to ${MONGO_LOCATION} failed`);
+        logger.error(`Connection to ${MONGO_LOCATION} failed`, err);
       })
   }
 }

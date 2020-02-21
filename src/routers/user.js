@@ -4,13 +4,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const auth = require("../utils/auth");
+const logger = require("../utils/logger");
 
 const User = require("../models/user");
 
 /**
  * @method - POST
- * @param - /signup
- * @description - User SignUp
+ * @param - /register
+ * @description - Register a new user
  */
 
 router.post(
@@ -24,6 +25,8 @@ router.post(
     })
   ],
   async (req, res) => {
+    logger.info(`POST /user/register from ${req.ip}`);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -72,11 +75,17 @@ router.post(
         }
       );
     } catch (err) {
-      console.log(err.message);
+      logger.error("Error in Saving", err);
       res.status(500).send("Error in Saving");
     }
   }
 );
+
+/**
+ * @method - POST
+ * @description - Login a user
+ * @param - /user/login
+ */
 
 router.post(
   "/login",
@@ -89,8 +98,9 @@ router.post(
     })
   ],
   async (req, res) => {
-    const errors = validationResult(req);
+    logger.info(`GET /user/login from ${req.ip}`);
 
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         errors: errors.array()
@@ -102,8 +112,6 @@ router.post(
       let user = await User.findOne({
         username
       });
-
-      console.log(username +" "+password);
 
       if (!user)
         return res.status(400).json({
@@ -145,12 +153,14 @@ router.post(
 );
 
 /**
- * @method - POST
+ * @method - GET
  * @description - Get LoggedIn User
  * @param - /user/me
  */
 
 router.get("/me", auth, async (req, res) => {
+  logger.info(`GET /user/me from ${req.ip}`);
+
   try {
     const user = await User.findById(req.user.id);
     res.json(user);
