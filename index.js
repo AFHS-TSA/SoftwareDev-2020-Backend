@@ -1,20 +1,17 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const user = require("./routes/user");
-const mongoDB = require("./config/db");
+require('dotenv').config();
 
-const app = express();
+let appEnvVars = ['PORT'];
+let mongoEnvVars = [ 'MONGO_HOSTNAME', 'MONGO_DATABASE', 'MONGO_PASSWORD', 'MONGO_USERNAME'];
 
-const PORT = process.env.PORT || 4000;
+appEnvVars = [...appEnvVars, ...mongoEnvVars];
 
-app.use(bodyParser.json());
+let unusedEnvVars = appEnvVars.filter((i) => !process.env[i]);
 
-app.get("/", (req, res) => {
-  res.json({ message: "API Working"  });
-});
+// Be sure all of the ENV variables are properly set
+if (unusedEnvVars.length) {
+  console.error(`Required ENV variables are not set: [${unusedEnvVars.join(', ')}]`);
+  process.exit(1);
+}
 
-app.use("/user", user);
-
-app.listen(PORT, (req, res) => {
-  console.log(`Server Started at PORT ${PORT}`);
-});
+// Launch the application
+const { app } = require("./src/app");

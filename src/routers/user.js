@@ -3,9 +3,9 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
-const auth = require("../middleware/auth");
+const auth = require("../utils/auth");
 
-const User = require("../model/User");
+const User = require("../models/user");
 
 /**
  * @method - POST
@@ -103,9 +103,11 @@ router.post(
         username
       });
 
+      console.log(username +" "+password);
+
       if (!user)
         return res.status(400).json({
-          message: "User doesn't exist or Incorrect password"
+          message: "aa User doesn't exist or Incorrect password"
         });
 
       const isMatch = await bcrypt.compare(password, user.password);
@@ -150,7 +152,6 @@ router.post(
 
 router.get("/me", auth, async (req, res) => {
   try {
-    // request.user is getting fetched from Middleware after token authentication
     const user = await User.findById(req.user.id);
     res.json(user);
   } catch (e) {
