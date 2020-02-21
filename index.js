@@ -1,9 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const user = require("./routes/user");
-const InitiateMongoServer = require("./config/db");
-
-InitiateMongoServer();
+const mongoDB = require("./config/db");
 
 const app = express();
 

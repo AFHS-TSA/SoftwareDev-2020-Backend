@@ -4,17 +4,24 @@ require("dotenv").config();
 
 const MONGOURI = `mongodb+srv://admin:${process.env.DB_PASS}@cluster0-awbga.gcp.mongodb.net/tsa`;
 
-const InitiateMongoServer = async () => {
-  try {
+class MongoDB {
+  constructor() {
+    console.log('making database object');
+    this._connect();
+  }
+
+  async _connect() {
     await mongoose.connect(MONGOURI, {
       useUnifiedTopology: true,
       useNewUrlParser: true
-    });
-    console.log("Connection Sucessful");
-  } catch (e) {
-    console.log(e);
-    throw e;
+    })
+      .then(() => {
+        console.log(`Connection to ${MONGOURI} successful`);
+      })
+      .catch(err => {
+        console.log(`Connection to ${MONGOURI} failed`);
+      })
   }
-};
+}
 
-module.exports = InitiateMongoServer;
+module.exports = new MongoDB();
