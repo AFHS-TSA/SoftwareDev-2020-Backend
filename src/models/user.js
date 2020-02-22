@@ -9,6 +9,14 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  name: {
+    type: String,
+    required: false
+  },
+  description: {
+    type: String,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now()

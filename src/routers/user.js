@@ -22,7 +22,8 @@ router.post(
       .isEmpty(),
     check("password", "Please enter a valid password").isLength({
       min: 6
-    })
+    }),
+    check("description", "Please enter a description")
   ],
   async (req, res) => {
     logger.info(`POST /user/register from ${req.ip}`);
@@ -34,7 +35,7 @@ router.post(
       });
     }
 
-    const { username, password } = req.body;
+    const { username, password, description, name } = req.body;
     try {
       let user = await User.findOne({
         username
@@ -47,7 +48,9 @@ router.post(
 
       user = new User({
         username,
-        password
+        password,
+        description,
+        name
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -115,7 +118,7 @@ router.post(
 
       if (!user)
         return res.status(400).json({
-          message: "aa User doesn't exist or Incorrect password"
+          message: "User doesn't exist or Incorrect password"
         });
 
       const isMatch = await bcrypt.compare(password, user.password);
@@ -143,8 +146,8 @@ router.post(
           });
         }
       );
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      logger.error("Server Error", err);
       res.status(500).json({
         message: "Server Error"
       });
@@ -154,7 +157,7 @@ router.post(
 
 /**
  * @method - GET
- * @description - Get LoggedIn User
+ * @description - Get all data about logged in user
  * @param - /user/me
  */
 
@@ -164,8 +167,25 @@ router.get("/me", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     res.json(user);
-  } catch (e) {
-    res.send({ message: "Error in Fetching user" });
+  } catch (err) {
+    logger.error("Error in Fetching user", err);
+    res.status(400).send("Error in Fetching user");
+  }
+});
+
+
+router.put("/name", auth, async (req, res) => {
+  logger.info(`PUT /user/name from ${req.ip}`);
+
+  try {
+    const user = await User.findById(req.user.id);
+    user.name = req.body.name;
+
+    await user.save();
+    res.status(200).send({ name: req.body.name });
+  } catch (err) {
+    logger.error("Error in Saving", err);
+    res.status(500).send("Error in Saving");
   }
 });
 
